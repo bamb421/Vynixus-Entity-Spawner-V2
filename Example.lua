@@ -1,6 +1,6 @@
 ---====== Load spawner ======---
 
-local spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Doors/Entity%20Spawner/V2/Source.lua"))()
+local spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/bamb421/vyn-entity-spawner-test/refs/heads/main/Source.lua"))()
 
 ---====== Create entity ======---
 
@@ -48,11 +48,6 @@ local entity = spawner.Create({
 		Range = 40,
 		Resist = false,
 		Break = true
-	},
-	Death = {
-		Type = "Guiding", -- "Curious"
-		Hints = {"Death", "Hints", "Go", "Here"},
-		Cause = ""
 	}
 })
 
