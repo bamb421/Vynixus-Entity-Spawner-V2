@@ -769,12 +769,12 @@ spawner.Run = function(entityTable)
 			if config.Lights.Flicker.Enabled then
 				local currentRoom = GetCurrentRoom(false)
 				if currentRoom then
-					moduleScripts.Module_Events.flicker(currentRoom, config.Lights.Flicker.Duration)
+					--moduleScripts.Module_Events.flicker(currentRoom, config.Lights.Flicker.Duration)
 				end
 			end
 			-- Earthquake
 			if config.Earthquake.Enabled then
-				task.defer(moduleScripts.Earthquake, moduleScripts.Main_Game, currentRoom)
+				--task.defer(moduleScripts.Earthquake, moduleScripts.Main_Game, currentRoom)
 			end
 
 			-- Movement detection handling
@@ -815,7 +815,7 @@ spawner.Run = function(entityTable)
 										local latestRoom = GetCurrentRoom(true)
 										if room ~= latestRoom then
 											if config.Lights.Shatter then -- Shatter lights
-												moduleScripts.Module_Events.shatter(room)
+												--moduleScripts.Module_Events.shatter(room)
 
 											elseif config.Lights.Repair then -- Repair lights
 												FixRoomLights(room)
@@ -867,7 +867,7 @@ spawner.Run = function(entityTable)
 
 									cloned[1] = c.Values[1] / c.Range * (c.Range - mag) -- Magnitude
 									cloned[2] = c.Values[2] / c.Range * (c.Range - mag) -- Roughness
-									moduleScripts.Main_Game.camShaker:ShakeOnce(table.unpack(cloned))
+									--moduleScripts.Main_Game.camShaker:ShakeOnce(table.unpack(cloned))
 								end
 							end
 						end
