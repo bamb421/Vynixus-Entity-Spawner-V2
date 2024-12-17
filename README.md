@@ -7,7 +7,7 @@ original code: https://github.com/RegularVynixu/Utilities/tree/main/Doors/Entity
 
 what doesnt work
   - camera shake (soon?)
-
+  - light flickering (soon??)
 what will never happen
 - custom guiding or curious light messages (xeno and solara suck too much)
   
