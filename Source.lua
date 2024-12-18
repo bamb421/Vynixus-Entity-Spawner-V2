@@ -111,11 +111,6 @@ local defaultConfig = {
 		Resist = false,
 		Break = true
 	},
-	Death = {
-		Type = "Guiding", -- "Curious"
-		Hints = {"Death", "Hints", "Go", "Here"},
-		Cause = ""
-	}
 }
 local ambientStorage = {}
 local deathTypes = {
@@ -611,11 +606,12 @@ function GetAllDatatypes(config, datatype, ignoreList) -- thanks ChatGPT lmao
 	return filteredResults
 end
 
+--[[
 function PrerunCheck(entityTable)
 	local config = entityTable.Config
 	local rebounding = config.Rebounding
 
-	if entityTable.Model:GetAttribute("Running") then
+	if entityTable:WaitForChild("Model"):GetAttribute("Running") then
 		warn("Entity awweady wunnying :3 sowwy")
 		return false
 
@@ -634,6 +630,7 @@ function PrerunCheck(entityTable)
 
 	return true
 end
+--]]
 
 spawner.Create = function(config)
 	ApplyConfigDefaults(config, defaultConfig)
@@ -738,10 +735,11 @@ end
 
 spawner.Run = function(entityTable)
 	task.spawn(function()
+		--[[
 		if PrerunCheck(entityTable) == false then
 			return
 		end
-
+--]]
 		local model = entityTable.Model
 		local config = entityTable.Config
 		local debug = entityTable.Debug
