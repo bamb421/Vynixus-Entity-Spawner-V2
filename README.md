@@ -1,4 +1,4 @@
-# vyn-entity-spawner-test
+# Vynixu's Entity Spawner V2 [XENO AND SOLARA PORT]
 (DISCLAIMER: do not credit me as this is vynixu's work and all i did was remove the camera shake)
 
 just a test to see if i can get vynixu's entity spawner v2 to somewhat function on xeno and solara (it semi works)
