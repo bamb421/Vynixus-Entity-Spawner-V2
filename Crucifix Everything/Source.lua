@@ -19,50 +19,47 @@ local localPlayerGui = localPlayer:WaitForChild("PlayerGui")
 local localMouse = localPlayer:GetMouse()
 
 local assets = {
-    Repentance = LoadCustomInstance("https://github.com/RegularVynixu/Utilities/blob/main/Doors/Entity%20Spawner/Assets/Repentance.rbxm?raw=true"),
-    Crucifix = LoadCustomInstance("https://github.com/RegularVynixu/Utilities/raw/refs/heads/main/Doors/Item%20Spawner/Assets/Crucifix.rbxm")
-}
-local moduleScripts = {
-	Main_Game = require(localPlayerGui.MainUI.Initiator.Main_Game),
+	Repentance = LoadCustomInstance("https://github.com/RegularVynixu/Utilities/blob/main/Doors/Entity%20Spawner/Assets/Repentance.rbxm?raw=true"),
+	Crucifix = LoadCustomInstance("https://github.com/RegularVynixu/Utilities/raw/refs/heads/main/Doors/Item%20Spawner/Assets/Crucifix.rbxm")
 }
 getgenv().vynixu_crucifix_manager = {
-    Signals = {},
-    Crucifixes = {}
+	Signals = {},
+	Crucifixes = {}
 }
 local module = {}
 
 -- Functions
 function WaitUntil(sound, t)
-    repeat RunService.RenderStepped:Wait() until sound.TimePosition >= t
+	repeat RunService.RenderStepped:Wait() until sound.TimePosition >= t
 end
 
 function FadeOut(pentagram)
-    for _, c in pentagram:GetChildren() do
-        if c.Name == "BeamFlat" then
-            task.delay(c:GetAttribute("Delay"), function()
-                TweenService:Create(c, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In), { Brightness = 0 }):Play()
-            end)
+	for _, c in pentagram:GetChildren() do
+		if c.Name == "BeamFlat" then
+			task.delay(c:GetAttribute("Delay"), function()
+				TweenService:Create(c, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In), { Brightness = 0 }):Play()
+			end)
 
-        elseif c.Name == "BeamChain" then
-            TweenService:Create(c, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In), { Brightness = 0 }):Play()
-        end
-    end
+		elseif c.Name == "BeamChain" then
+			TweenService:Create(c, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In), { Brightness = 0 }):Play()
+		end
+	end
 end
 
 function Crucifix(model, playerTool, config)
-    -- Handle crucifix uses
-    if typeof(config.Uses) == "number" then
-        config.Uses -= 1
+	-- Handle crucifix uses
+	if typeof(config.Uses) == "number" then
+		config.Uses -= 1
 
-        if config.Uses <= 0 then
-            Destroy(playerTool)
-        end
-    end
+		if config.Uses <= 0 then
+			Destroy(playerTool)
+		end
+	end
 
-    -- Setup
-    local tool = assets.Crucifix:Clone()
-    tool:PivotTo(localRoot.CFrame)
-    tool.Parent = workspace
+	-- Setup
+	local tool = assets.Crucifix:Clone()
+	tool:PivotTo(localRoot.CFrame)
+	tool.Parent = workspace
 
 	local toolPivot = tool:GetPivot()
 	local entityPivot = model:GetPivot()
@@ -71,39 +68,38 @@ function Crucifix(model, playerTool, config)
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.FilterDescendantsInstances = {localCharacter, model}
 	local result = workspace:Raycast(entityPivot.Position, Vector3.new(0, -1000, 0), params)
-	
-    if not result then
-        return
-    end
 
-    model:SetAttribute("BeingBanished", true)
+	if not result then
+		return
+	end
 
-    -- Variables
+	model:SetAttribute("BeingBanished", true)
+
+	-- Variables
 	local repentance = assets.Repentance:Clone()
 	local crucifix = repentance.Crucifix
 	local pentagram = repentance.Pentagram
 	local entityPart = repentance.Entity
 	local sound = (config.Resist and crucifix.SoundFail or crucifix.Sound)
-	local shaker = moduleScripts.Main_Game.camShaker:StartShake(5, 20, 2, Vector3.new())
 
-    -- Repentance setup
+	-- Repentance setup
 	repentance:PivotTo(CFrame.new(result.Position))
 	crucifix.CFrame = toolPivot
 	repentance.Entity.CFrame = entityPivot
-    crucifix.BodyPosition.Position = (localCharacter:GetPivot() * CFrame.new(0.5, 3, -6)).Position
+	crucifix.BodyPosition.Position = (localCharacter:GetPivot() * CFrame.new(0.5, 3, -6)).Position
 	repentance.Parent = workspace
 	sound:Play()
 
-    -- Teleport model to repentance entity part
+	-- Teleport model to repentance entity part
 	task.spawn(function()
-        if not config.Resist then
-            while model.Parent and repentance.Parent do
-                model:PivotTo(entityPart.CFrame)
-                task.wait()
-            end
+		if not config.Resist then
+			while model.Parent and repentance.Parent do
+				model:PivotTo(entityPart.CFrame)
+				task.wait()
+			end
 
-            model:Destroy()
-        end
+			model:Destroy()
+		end
 	end)
 
 	-- Pentagram animation
@@ -112,52 +108,50 @@ function Crucifix(model, playerTool, config)
 	task.delay(2, pentagram.Circle.Destroy, pentagram.Circle)
 
 	task.spawn(function()
-        WaitUntil(sound, 2.625)
-		
-        TweenService:Create(pentagram.Base.LightAttach.LightBright, TweenInfo.new(1.5, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), {
+		WaitUntil(sound, 2.625)
+
+		TweenService:Create(pentagram.Base.LightAttach.LightBright, TweenInfo.new(1.5, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), {
 			Brightness = 5,
 			Range = 40
 		}):Play()
-		
-        TweenService:Create(crucifix.Light, TweenInfo.new(1.5, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), {
+
+		TweenService:Create(crucifix.Light, TweenInfo.new(1.5, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), {
 			Brightness = 11.25,
 			Range = 30
 		}):Play()
-		
-        task.wait(1.5)
-		
-        TweenService:Create(pentagram.Base.LightAttach.LightBright, TweenInfo.new(1.5, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), {
+
+		task.wait(1.5)
+
+		TweenService:Create(pentagram.Base.LightAttach.LightBright, TweenInfo.new(1.5, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), {
 			Brightness = 0,
 			Range = 0
 		}):Play()
-		
-        TweenService:Create(crucifix.Light, TweenInfo.new(1.5, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), {
+
+		TweenService:Create(crucifix.Light, TweenInfo.new(1.5, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), {
 			Brightness = 0,
 			Range = 0
 		}):Play()
 
 		if config.Resist == false then
-            TweenService:Create(crucifix.Light, TweenInfo.new(1, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), { Brightness = 15, Range = 40 }):Play()
-            shaker:StartFadeOut(3)
-            FadeOut(pentagram)
-            TweenService:Create(crucifix.BodyAngularVelocity, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), { AngularVelocity = Vector3.new() }):Play()
-        end
+			TweenService:Create(crucifix.Light, TweenInfo.new(1, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), { Brightness = 15, Range = 40 }):Play()
+			FadeOut(pentagram)
+			TweenService:Create(crucifix.BodyAngularVelocity, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), { AngularVelocity = Vector3.new() }):Play()
+		end
 	end)
 
 	-- Actions
 	if config.Resist == false then
 		WaitUntil(sound, 2)
-		
-        TweenService:Create(entityPart, TweenInfo.new(3, Enum.EasingStyle.Back, Enum.EasingDirection.In), { CFrame = repentance.Entity.CFrame - Vector3.new(0, 25, 0) }):Play()
-		
-        WaitUntil(sound, 6.75)
+
+		TweenService:Create(entityPart, TweenInfo.new(3, Enum.EasingStyle.Back, Enum.EasingDirection.In), { CFrame = repentance.Entity.CFrame - Vector3.new(0, 25, 0) }):Play()
+
+		WaitUntil(sound, 6.75)
 	else
 		WaitUntil(sound, 4)
 
 		TweenService:Create(crucifix.BodyAngularVelocity, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), { AngularVelocity = Vector3.new() }):Play()
 		TweenService:Create(pentagram.Base.LightAttach.LightBright, TweenInfo.new(1.5, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), { Brightness = 0, Range = 0, Color = Color3.fromRGB(255, 116, 130) }):Play()
 		TweenService:Create(crucifix.Light, TweenInfo.new(1.5, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), { Brightness = 0, Range = 0, Color = Color3.fromRGB(255, 116, 130) }):Play()
-		shaker:StartFadeOut(3)
 		task.spawn(function()
 			local color = Instance.new("Color3Value")
 			color.Value = Color3.fromRGB(137, 207, 255)
@@ -188,7 +182,7 @@ function Crucifix(model, playerTool, config)
 
 	if not config.Resist then
 		repentance.Crucifix.ExplodeParticle:Emit(math.random(20, 30))
-		moduleScripts.Main_Game.camShaker:ShakeOnce(7.5, 7.5, 0.25, 1.5)
+
 	else
 		model:SetAttribute("BeingBanished", false)
 		model:SetAttribute("Paused", false)
@@ -199,59 +193,59 @@ function Crucifix(model, playerTool, config)
 end
 
 function Destroy(playerTool)
-    vynixu_crucifix_manager.Crucifixes[playerTool] = nil
-    playerTool:Destroy()
+	vynixu_crucifix_manager.Crucifixes[playerTool] = nil
+	playerTool:Destroy()
 end
 
 module.GiveCrucifix = function(config)
-    -- Give player crucifix with config
-    local crucifix = assets.Crucifix:Clone()
+	-- Give player crucifix with config
+	local crucifix = assets.Crucifix:Clone()
 
-    -- Register crucifix
-    vynixu_crucifix_manager.Crucifixes[crucifix] = config
+	-- Register crucifix
+	vynixu_crucifix_manager.Crucifixes[crucifix] = config
 
-    -- Parent crucifix to backpack
-    crucifix.Parent = localPlayer.Backpack
+	-- Parent crucifix to backpack
+	crucifix.Parent = localPlayer.Backpack
 end
 
 -- Main
 if vynixu_crucifix_manager.Signals.InputBegan then
-    -- Disconnect potential previous signal
-    vynixu_crucifix_manager.Signals.InputBegan:Disconnect()
+	-- Disconnect potential previous signal
+	vynixu_crucifix_manager.Signals.InputBegan:Disconnect()
 end
 
 -- Create new signal
 vynixu_crucifix_manager.Signals.InputBegan = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if not gameProcessed and input.UserInputType == Enum.UserInputType.MouseButton1 and localCharacter:FindFirstChild("Crucifix") then
-        local playerTool = localCharacter.Crucifix
-        local config = vynixu_crucifix_manager.Crucifixes[playerTool]
+	if not gameProcessed and input.UserInputType == Enum.UserInputType.MouseButton1 and localCharacter:FindFirstChild("Crucifix") then
+		local playerTool = localCharacter.Crucifix
+		local config = vynixu_crucifix_manager.Crucifixes[playerTool]
 
-        -- Validate config
-        if not config then
-            warn("Could not find Crucifix config for:", playerTool)
-            return
-        elseif config.EntitiesOnly == true then
-            return -- Custom entities only, handled by Entity Spawner module
-        end
+		-- Validate config
+		if not config then
+			warn("Could not find Crucifix config for:", playerTool)
+			return
+		elseif config.EntitiesOnly == true then
+			return -- Custom entities only, handled by Entity Spawner module
+		end
 
-        -- Get target
-        local target = localMouse.Target
-        if target then
-            local model = target.Parent
-            
-            -- Validate target
-            if model:IsA("Model") and not model:GetAttribute("BeingBanished") and not table.find(config.IgnoreList, model) then
-                local isCustomEntity = model:GetAttribute("CustomEntity")
+		-- Get target
+		local target = localMouse.Target
+		if target then
+			local model = target.Parent
 
-                if config.EntitiesOnly == true and not isCustomEntity then
-                    return -- Ignore if not custom entity
-                end
+			-- Validate target
+			if model:IsA("Model") and not model:GetAttribute("BeingBanished") and not table.find(config.IgnoreList, model) then
+				local isCustomEntity = model:GetAttribute("CustomEntity")
 
-                -- Banish whatever
-                Crucifix(model, playerTool, config)
-            end
-        end
-    end
+				if config.EntitiesOnly == true and not isCustomEntity then
+					return -- Ignore if not custom entity
+				end
+
+				-- Banish whatever
+				Crucifix(model, playerTool, config)
+			end
+		end
+	end
 end)
 
 warn("Crucifix Everything script : by .vynixu") -- I feel like this is necessary
