@@ -7,6 +7,8 @@ The Crucifix everything script also works.
 
 Original Repo: https://github.com/RegularVynixu/Utilities/tree/main/Doors/Entity%20Spawner/V2
 
+Trailer Video: https://youtu.be/FoI14Hp6gWg
+
 **MISSING FEATURES**
  - Custom Guiding light and Curious light messages (Xeno and Solara don't support firesignal)
  - Camera Shake (Ditto but it's with require, could possibly be added)
