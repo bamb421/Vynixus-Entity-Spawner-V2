@@ -17,7 +17,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
+local l_TweenService_0 = game:GetService("TweenService"); -- too lazy to replace mentions of tweenservice in the decompiled code
+local l_CollectionService_0 = game:GetService("CollectionService");
+
 -- Variables
+local v0 = {};
+local l_Children_0 = game:GetService("ReplicatedStorage").Misc.Shards:GetChildren();
+local v6 = nil;
 local localPlayer = Players.LocalPlayer
 local localChar = localPlayer.Character or localPlayer.CharacterAdded:Wait()
 local localHum = localChar:WaitForChild("Humanoid")
@@ -126,7 +132,7 @@ local l_TweenService_0 = game:GetService("TweenService");
 local l_CollectionService_0 = game:GetService("CollectionService");
 local currentRoom = game.ReplicatedStorage.GameData.LatestRoom.Value
 
-v0.flicker = function(v71, v72, v73, v74)
+v0.flicker = function(v71, v72, v73, v74) -- flicker lights
 	pcall(function()
 		task.spawn(function()
 			if not (typeof(v71) == "Instance") then
@@ -250,6 +256,199 @@ v0.flicker = function(v71, v72, v73, v74)
 			end;
 		end);
 	end);
+end;
+
+v0.shatter = function(v20, v21, v22, v23) --shatter lights
+    pcall(function()
+        task.spawn(function()
+            if not (typeof(v20) == "Instance") then
+                if typeof(v20) == "number" then
+                    v20 = workspace.CurrentRooms:FindFirstChild(v20);
+                else
+                    v20 = nil;
+                end;
+            end;
+            if v20 == nil or v20:GetAttribute("CannotFlicker") then
+                return;
+            else
+                local v24 = {};
+                for _, v26 in pairs(v20:GetDescendants()) do
+                    if v26:IsA("Model") and l_CollectionService_0:HasTag(v26, "LightSource") and v26:GetAttribute("Shattered") ~= true then
+                        for _, v28 in pairs(v26:GetDescendants()) do
+                            if v28:IsA("Light") and v28:GetAttribute("OGBrightness") == nil then
+                                v28:SetAttribute("OGBrightness", v28.Brightness);
+                            end;
+                        end;
+                        table.insert(v24, v26);
+                    end;
+                end;
+                v21 = math.min(v21 or 100, #v24);
+                v22 = v22 or 60;
+                v23 = v23 or Random.new(tick());
+                local v29 = false;
+                if v22 < 0 then
+                    v22 = math.abs(v22);
+                    v29 = true;
+                end;
+                local v30 = 120 / v22;
+                if v21 < 50 then
+                    local v31 = {};
+                    for _ = 1, 100 do
+                        local v33 = v24[v23:NextInteger(1, #v24)];
+                        local v34 = true;
+                        for _, v36 in pairs(v31) do
+                            if v36 == v33 then
+                                v34 = false;
+                            end;
+                        end;
+                        if v34 then
+                            table.insert(v31, v33);
+                        end;
+                        if not (#v31 < v21) then
+                            break;
+                        end;
+                    end;
+                    v24 = v31;
+                end;
+                if v21 > 5 then
+                    v20:SetAttribute("Ambient", Color3.new(0, 0, 0));
+                end;
+                local _ = tick();
+                for _, v39 in pairs(v24) do
+                    local v40 = (v20.RoomEntrance.Position - v39.PrimaryPart.Position).Magnitude / v22 + v23:NextInteger(-10, 10) / 50;
+                    if v29 then
+                        v40 = (v20.RoomExit.Position - v39.PrimaryPart.Position).Magnitude / v22;
+                    end;
+                    local v41 = v23:NextInteger(5, 20) / 100;
+                    if v21 <= 5 and v21 < #v24 then
+                        v40 = v23:NextInteger(5, 300) / 10;
+                        v41 = v23:NextInteger(5, 70) / 100;
+                    end;
+                    do
+                        local l_v41_0 = v41;
+                        task.delay(v40, function()
+                            local l_v39_FirstChild_0 = v39:FindFirstChild("Neon", true);
+                            if v39:GetAttribute("Shattered") or l_v39_FirstChild_0 and l_v39_FirstChild_0.Material ~= Enum.Material.Neon then
+                                return;
+                            else
+                                v39:SetAttribute("Shattered", true);
+                                for _, v45 in v39:GetDescendants() do
+                                    if v45:HasTag("LightBeam") or v45.Name == "LightCenterParticle" then
+                                        v45:Destroy();
+                                    end;
+                                end;
+                                local v46 = game:GetService("ReplicatedStorage").Sounds.BulbCharge:Clone();
+                                v46.Parent = v39.PrimaryPart;
+                                v46.Pitch = v46.Pitch + math.random(-140, 140) / 800;
+                                v46:Play();
+                                game.Debris:AddItem(v46, 2);
+                                if l_v39_FirstChild_0 then
+                                    l_TweenService_0:Create(l_v39_FirstChild_0, TweenInfo.new(l_v41_0, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                                        Transparency = 0, 
+                                        Color = Color3.new(1, 1, 1)
+                                    });
+                                end;
+                                for _, v48 in pairs(v39:GetDescendants()) do
+                                    if v48:IsA("Light") then
+                                        l_TweenService_0:Create(v48, TweenInfo.new(l_v41_0, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                                            Brightness = v48:GetAttribute("OGBrightness") * 2
+                                        }):Play();
+                                    end;
+                                end;
+                                wait(l_v41_0 + 0.01);
+                                if l_v39_FirstChild_0 then
+                                    l_v39_FirstChild_0.Transparency = 1;
+                                end;
+                                for _, v50 in pairs(v39:GetDescendants()) do
+                                    if v50:IsA("Light") then
+                                        l_TweenService_0:Create(v50, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                                            Brightness = 0
+                                        }):Play();
+                                    end;
+                                end;
+                                v46:Stop();
+                                local v51 = game:GetService("ReplicatedStorage").Sounds.BulbBreak:Clone();
+                                v51.Parent = v39.PrimaryPart;
+                                v51.Pitch = v51.Pitch + math.random(-140, 140) / 1000;
+                                v51.TimePosition = math.random(0, 7) * 3;
+                                v51:Play();
+                                game.Debris:AddItem(v51, 2);
+                                pcall(function()
+                                    v6.shakerel(v39.PrimaryPart.Position, 2, 12, 0, 0.4, (Vector3.new(0, 0, 0, 0)));
+                                    for _ = 1, 5 do
+                                        local v53 = l_Children_0[math.random(1, #l_Children_0)]:Clone();
+                                        local v54 = l_v39_FirstChild_0 or v39.PrimaryPart;
+                                        local v55 = v54.Size / 2;
+                                        v53.CFrame = v54.CFrame * CFrame.new(v23:NextNumber(-v55.X, v55.X), v23:NextNumber(-v55.Y, v55.Y), v23:NextNumber(-v55.Z, v55.Z));
+                                        v53.Velocity = Vector3.new(math.random(-6, 6), math.random(-6, 6), math.random(-6, 6));
+                                        v53.RotVelocity = Vector3.new(math.random(-3, 3) / 5, math.random(-3, 3) / 5, math.random(-3, 3) / 5);
+                                        v53.Parent = workspace.CurrentCamera;
+                                        game.Debris:AddItem(v53, math.random(20, 35));
+                                    end;
+                                end);
+                                return;
+                            end;
+                        end);
+                    end;
+                end;
+                if v20:GetAttribute("IsDark") then
+                    local function _(v56)
+                        local v57 = 2;
+                        local l_v56_FirstAncestorWhichIsA_0 = v56:FindFirstAncestorWhichIsA("BasePart");
+                        if l_v56_FirstAncestorWhichIsA_0 then
+                            v57 = (v20.RoomEntrance.Position - l_v56_FirstAncestorWhichIsA_0.Position).Magnitude / v22;
+                        end;
+                        return v57;
+                    end;
+                    for _, v61 in pairs(v20:GetDescendants()) do
+                        if v61:IsA("Light") and v61:GetAttribute("ForceOn") ~= true then
+                            if not (v61.Parent.Name == "LightBase") then
+                                local l_delay_0 = task.delay;
+                                local v63 = 2;
+                                local l_v61_FirstAncestorWhichIsA_0 = v61:FindFirstAncestorWhichIsA("BasePart");
+                                if l_v61_FirstAncestorWhichIsA_0 then
+                                    v63 = (v20.RoomEntrance.Position - l_v61_FirstAncestorWhichIsA_0.Position).Magnitude / v22;
+                                end;
+                                l_delay_0(v63, function()
+                                    l_TweenService_0:Create(v61, TweenInfo.new(v30 / 2, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
+                                        Brightness = 0
+                                    }):Play();
+                                end);
+                            end;
+                        elseif v61:IsA("ParticleEmitter") and v61:GetAttribute("Light") == true then
+                            local l_delay_1 = task.delay;
+                            local v66 = 2;
+                            local l_v61_FirstAncestorWhichIsA_1 = v61:FindFirstAncestorWhichIsA("BasePart");
+                            if l_v61_FirstAncestorWhichIsA_1 then
+                                v66 = (v20.RoomEntrance.Position - l_v61_FirstAncestorWhichIsA_1.Position).Magnitude / v22;
+                            end;
+                            l_delay_1(v66, function()
+                                v61.Enabled = false;
+                            end);
+                        elseif v61:IsA("Sound") and v61:GetAttribute("Light") == true then
+                            local l_delay_2 = task.delay;
+                            local v69 = 2;
+                            local l_v61_FirstAncestorWhichIsA_2 = v61:FindFirstAncestorWhichIsA("BasePart");
+                            if l_v61_FirstAncestorWhichIsA_2 then
+                                v69 = (v20.RoomEntrance.Position - l_v61_FirstAncestorWhichIsA_2.Position).Magnitude / v22;
+                            end;
+                            l_delay_2(v69, function()
+                                v61:Stop();
+                            end);
+                        end;
+                    end;
+                end;
+                wait(v30 / 2);
+                if v21 >= 5 then
+                    l_TweenService_0:Create(game.Lighting, TweenInfo.new(v30 / 2, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut), {
+                        Ambient = Color3.new(0, 0, 0)
+                    }):Play();
+                    v20:SetAttribute("Ambient", Color3.new(0, 0, 0));
+                end;
+                return;
+            end;
+        end);
+    end);
 end;
 
 function CloneTable(tbl)
@@ -945,10 +1144,11 @@ spawner.Run = function(entityTable)
 										local latestRoom = GetCurrentRoom(true)
 										if room ~= latestRoom then
 											if config.Lights.Shatter then -- Shatter lights
-												--moduleScripts.Module_Events.shatter(room)
-
+                                                v0.shatter(room)
+													--[[
 											elseif config.Lights.Repair then -- Repair lights
 												FixRoomLights(room)
+											--]]
 											end
 										end
 									end
