@@ -1,6 +1,6 @@
 ---====== Load module ======---
 
-local module = loadstring(game:HttpGet("https://https://raw.githubusercontent.com/bamb421/VynsEntitySpawnerXenoSolara/refs/heads/main/Crucifix%20Everything/Source.lua"))()
+local module = loadstring(game:HttpGet("https://raw.githubusercontent.com/bamb421/VynsEntitySpawnerXenoSolara/refs/heads/main/Crucifix%20Everything/Source.lua"))()
 
 ---====== Create crucifix ======---
 
