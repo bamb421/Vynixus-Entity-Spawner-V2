@@ -120,6 +120,138 @@ local deathTypes = {
 local spawner = {}
 
 -- Functions
+
+local v0 = {};
+local l_TweenService_0 = game:GetService("TweenService");
+local l_CollectionService_0 = game:GetService("CollectionService");
+local currentRoom = game.ReplicatedStorage.GameData.LatestRoom.Value
+
+v0.flicker = function(v71, v72, v73, v74)
+	pcall(function()
+		task.spawn(function()
+			if not (typeof(v71) == "Instance") then
+				if typeof(v71) == "number" then
+					v71 = workspace.CurrentRooms:FindFirstChild(v71);
+				else
+					v71 = nil;
+				end;
+			end;
+			if v71 == nil or v71:GetAttribute("CannotFlicker") or v71:GetAttribute("IsDark") then
+				return;
+			else
+				local v75 = {};
+				for _, v77 in pairs(v71:GetDescendants()) do
+					if v77:IsA("Model") and l_CollectionService_0:HasTag(v77, "LightSource") and v77:GetAttribute("Shattered") ~= true then
+						for _, v79 in pairs(v77:GetDescendants()) do
+							if v79:IsA("Light") and v79:GetAttribute("OGBrightness") == nil then
+								v79:SetAttribute("OGBrightness", v79.Brightness);
+							end;
+						end;
+						table.insert(v75, v77);
+					end;
+				end;
+				v73 = math.min(v73 or 100, #v75);
+				v72 = v72 or 0.5;
+				v74 = v74 or Random.new(tick());
+				if v73 < 100 then
+					local v80 = {};
+					for _ = 1, 100 do
+						local v82 = v75[v74:NextInteger(1, #v75)];
+						local v83 = true;
+						for _, v85 in pairs(v80) do
+							if v85 == v82 then
+								v83 = false;
+							end;
+						end;
+						if v83 then
+							table.insert(v80, v82);
+						end;
+						if not (#v80 < v73) then
+							break;
+						end;
+					end;
+					v75 = v80;
+				end;
+				if v73 > 5 then
+					l_TweenService_0:Create(game.Lighting, TweenInfo.new(v72 / 2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out, 0, true), {
+						Ambient = Color3.new(0, 0, 0)
+					}):Play();
+				end;
+				local v86 = tick();
+				for _, v88 in v75 do
+					task.spawn(function()
+						pcall(function()
+							task.wait(v74:NextNumber(1, 30) / 100);
+							local v89 = v72 + v74:NextNumber(-100, 100) / 250;
+							for _ = 1, 1000 do
+								local v91 = v74:NextNumber(3, 12) / 100;
+								local v92 = v91 + v74:NextNumber(-20, 20) / 100;
+								if not v88:GetAttribute("Shattered") and not v71:GetAttribute("IsDark") then
+									if tick() >= v86 + v89 then
+										for _, v94 in pairs(v88:GetDescendants()) do
+											if v94:IsA("Light") then
+												v94.Brightness = 0;
+												l_TweenService_0:Create(v94, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+													Brightness = v94:GetAttribute("OGBrightness")
+												}):Play();
+											elseif v94:HasTag("LightBeam") then
+												local _ = l_TweenService_0:Create(v94, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+													Brightness = 1
+												});
+											end;
+											if v94.Name == "Neon" then
+												v94.Transparency = 0.8;
+												l_TweenService_0:Create(v94, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+													Transparency = 0.1
+												}):Play();
+											end;
+										end;
+										return;
+									else
+										local l_FirstChild_0 = v88.PrimaryPart:FindFirstChild("BulbZap", true);
+										if not l_FirstChild_0 then
+											l_FirstChild_0 = game:GetService("ReplicatedStorage").Sounds.BulbZap:Clone();
+											l_FirstChild_0.Parent = v88.PrimaryPart;
+										end;
+										if l_FirstChild_0 then
+											l_FirstChild_0.TimePosition = math.random(0, 13) / 20;
+											l_FirstChild_0.Pitch = l_FirstChild_0.Pitch + math.random(-100, 100) / 5000;
+											l_FirstChild_0:Play();
+										end;
+										for _, v98 in pairs(v88:GetDescendants()) do
+											if v98:IsA("Light") then
+												v98.Brightness = v98:GetAttribute("OGBrightness");
+												l_TweenService_0:Create(v98, TweenInfo.new(v91, Enum.EasingStyle.Back, Enum.EasingDirection.In, 0), {
+													Brightness = 0
+												}):Play();
+											elseif v98:HasTag("LightBeam") then
+												local _ = l_TweenService_0:Create(v98, TweenInfo.new(v91, Enum.EasingStyle.Back, Enum.EasingDirection.Out, 0), {
+													Brightness = 0
+												});
+											end;
+										end;
+										local l_v88_FirstChild_0 = v88:FindFirstChild("Neon", true);
+										if l_v88_FirstChild_0 and l_v88_FirstChild_0.Name == "Neon" then
+											l_v88_FirstChild_0.Transparency = 0;
+											l_TweenService_0:Create(l_v88_FirstChild_0, TweenInfo.new(v91, Enum.EasingStyle.Back, Enum.EasingDirection.In, 0), {
+												Transparency = 0.7
+											}):Play();
+										end;
+										task.wait(v92);
+									end;
+								else
+									break;
+								end;
+							end;
+						end);
+					end);
+				end;
+				return;
+			end;
+		end);
+	end);
+end;
+
 function CloneTable(tbl)
 	local cloned = {}
 	for key, value in pairs(tbl) do
@@ -767,7 +899,7 @@ spawner.Run = function(entityTable)
 			if config.Lights.Flicker.Enabled then
 				local currentRoom = GetCurrentRoom(false)
 				if currentRoom then
-					--moduleScripts.Module_Events.flicker(currentRoom, config.Lights.Flicker.Duration)
+					v0.flicker(currentRoom, config.Lights.Flicker.Duration)
 				end
 			end
 			-- Earthquake
