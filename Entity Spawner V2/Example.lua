@@ -1,6 +1,6 @@
 ---====== Load spawner ======---
 
-local spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/bamb421/vyn-entity-spawner-test/refs/heads/main/Source.lua"))()
+local spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/bamb421/VynixusEntitySpawner-LITE/refs/heads/main/Entity%20Spawner%20V2/Source.lua"))()
 
 ---====== Create entity ======---
 
