@@ -122,7 +122,6 @@ local spawner = {}
 local v0 = {};
 local l_TweenService_0 = game:GetService("TweenService");
 local l_CollectionService_0 = game:GetService("CollectionService");
-local currentRoom = game.ReplicatedStorage.GameData.LatestRoom.Value
 
 v0.flicker = function(v71, v72, v73, v74) -- flicker lights
 	pcall(function()
